@@ -3,7 +3,7 @@ const axios = require('axios');
 const { Client } = require('@notionhq/client');
 const fs = require('fs');
 const User = require('./user.js');
-const notion = new Client({ auth: process.env.NOTION_API_KEY });
+const notion = new Client({ auth: NOTION_API_KEY });
 
 // Create an array to store new user data
 const newUsers = [];
@@ -71,7 +71,7 @@ async function updateUserInNotion(databaseId, username, lastDate, dateBefore) {
 }
 
 (async () => {
-    const response = await notion.databases.query({ database_id: process.env.DATABASE_ID });
+    const response = await notion.databases.query({ database_id: DATABASE_ID });
 
     for (const element of response.results) {
         const name = element.properties["Name"].title[0].plain_text;
@@ -100,7 +100,7 @@ async function handleChangesOrFindOldestUser(newUsers) {
         console.log('Changes detected.');
         console.log('Updated User:', updatedUser);
 
-        updateUserInNotion(process.env.DATABASE_ID, updatedUser.name, updatedUser.date, updatedUser.dateBefore);
+        updateUserInNotion(DATABASE_ID, updatedUser.name, updatedUser.date, updatedUser.dateBefore);
 
         // Write the updated data back to the JSON file
         fs.writeFileSync('users.json', JSON.stringify(existingUsers, null, 2), 'utf-8');
@@ -121,7 +121,7 @@ async function handleChangesOrFindOldestUser(newUsers) {
         userToPay.date = today.toISOString().slice(0, 10); // Set the date to today
 
         // Update the user in Notion with the updated date and dateBefore
-        updateUserInNotion(process.env.DATABASE_ID, userToPay.name, userToPay.date, userToPay.dateBefore);
+        updateUserInNotion(DATABASE_ID, userToPay.name, userToPay.date, userToPay.dateBefore);
 
         // Update users.json with userToPay
         existingUsers.push(userToPay);
